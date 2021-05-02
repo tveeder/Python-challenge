@@ -1,77 +1,79 @@
+#PyPoll Challenge
+
+#Import modules os and csv
 import os
 import csv
 
-election_data = os.path.join("Resources","election_data.csv")
+#Open path for CSV file
+voter_csv = os.path.join('election_data.csv')
 
-# a list for all candidate names
-candidates = []
+#Create an empty dictionary to store candidates vote count
+vote_count = {}
 
-# a list for the votes
-num_votes = []
+#Create an empty dictionary to store candidates vote percentage
+vote_per = {}
 
-# a list for percentage of total votes
-percent_votes = []
+#Create a variable to hold the total vote count
+vote_total = 0
 
-# counter
-total_votes = 0
+with open(voter_csv, newline="") as csvfile:
+    voterreader = csv.reader(csvfile, delimiter=",")
 
-with open(election_data, newline = "") as csvfile:
-    csvreader = csv.reader(csvfile, delimiter = ",")
-    csv_header = next(csvreader)
+    #Skip header row
+    next(voterreader)
 
-    for row in csvreader:
-        # Add to our vote-counter 
-        total_votes += 1 
+    #Loop through the rows of data
+    for row in voterreader:
 
-        
-        #  this logic will check if candidate is in list
-        #   if not in list, it will add it, otherwise it will increase the count
+        #Count total votes
+        vote_total += 1
 
-        if row[2] not in candidates:
-            candidates.append(row[2])
-            index = candidates.index(row[2])
-            num_votes.append(1)
+        #Count votes for each candidate
+        if row[2] in vote_count:
+            vote_count[row[2]] += 1
+
+         #If the candidate does not exist in the dictionary add them and set value as 1
         else:
-            index = candidates.index(row[2])
-            num_votes[index] += 1
+            vote_count[row[2]] = 1
+
+#Create a variable to hold the winner vote count
+winner_count = 0
+
+#Loop through vote_count dictionary to calculate the vote percentage and to determine the winner
+for candidate in vote_count:
     
-    # Add to percent_votes list 
-    for votes in num_votes:
-        percentage = (votes/total_votes) * 100
-        percentage = round(percentage)
-        percentage = "%.3f%%" % percentage
-        percent_votes.append(percentage)
+    #Calculate and store candidate vote percentage
+    vote_per[candidate] = (vote_count[candidate] / vote_total) * 100
+
+    #Determine the winner
+    if vote_count[candidate] > winner_count:
+        winner_count = vote_count[candidate]
+        winner = candidate
+
+#Print out the results while writing them to a text file
+results_path = os.path.join('election_results.txt')
+
+with open(results_path, 'w', newline="") as txtfile:
+
+    txtfile.write(f'''
+Election Results
+-------------------------
+Total Votes: {vote_total}
+-------------------------\n''')
+
+    print(f'''\nElection Results
+-------------------------
+Total Votes: {vote_total}
+-------------------------''')
+
+    for candidate, votes in vote_count.items():
+        txtfile.write(f'{candidate}: {vote_per[candidate]:.3f}% ({votes})\n')
+        print(f'''{candidate}: {vote_per[candidate]:.3f}% ({votes})''')
     
-    # Find the winning candidate
-    winner = max(num_votes)
-    index = num_votes.index(winner)
-    winning_candidate = candidates[index]
+    txtfile.write(f'''-------------------------
+Winner: {winner}
+-------------------------''')
 
-
-print("Summary of Results")
-print("--------------------------")
-print(f"Total Votes: {str(total_votes)}")
-print("--------------------------")
-
-for i in range(len(candidates)):
-    print(f"{candidates[i]}: {str(percent_votes[i])} ({str(num_votes[i])})")
-
-print("--------------------------")
-print(f"Winner: {winning_candidate}")
-print("--------------------------")
-
-# Exporting to TEXT file
-output = open("output.txt", "w")
-line1 = "Election Results"
-line2 = "--------------------------"
-line3 = str(f"Total Votes: {str(total_votes)}")
-
-line4 = str("--------------------------")
-output.write('{}\n{}\n{}\n{}\n'.format(line1, line2, line3, line4))
-for i in range(len(candidates)):
-    line = str(f"{candidates[i]}: {str(percent_votes[i])} ({str(num_votes[i])})")
-    output.write('{}\n'.format(line))
-line5 = "--------------------------"
-line6 = str(f"Winner: {winning_candidate}")
-line7 = "--------------------------"
-output.write('{}\n{}\n{}\n'.format(line5, line6, line7))
+    print(f'''-------------------------
+Winner: {winner}
+-------------------------''')
