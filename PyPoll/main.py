@@ -1,14 +1,5 @@
 import os
 import csv
-
-election_data = os.path.join("Resources","election_data.csv")
-
-# a list for all candidate names
-candidates = []
-
-# a list for the votes
-num_votes = []
-
 # a list for percentage of total votes
 percent_votes = []
 
