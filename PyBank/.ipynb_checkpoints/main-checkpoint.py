@@ -6,7 +6,7 @@ import csv
 
 # Set the file path
 
-PyBankcsv = os.path.join("Resources","budget_data.csv")
+PyBankcsv = os.path.join('PyBank.csv')
 
 # Create the lists
 
